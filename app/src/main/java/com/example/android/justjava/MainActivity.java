@@ -2,8 +2,11 @@ package com.example.android.justjava;
 
 
 
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.EditText;
@@ -97,12 +100,26 @@ public class MainActivity extends AppCompatActivity {
      * @return the order summary message
      */
     private String createOrderSummary(String name, int price){
+        String subject = "Just Java order for " + name;
+
         String priceMessage = "Name: " + name;
         priceMessage += "\nAdd whipped cream? " + hasWhippedCream;
         priceMessage += "\nAdd chocolate? " + hasChocolate;
         priceMessage += "\nQuantity: " + mQuantity;
         priceMessage += "\nTotal: $" + price;
         priceMessage += "\nThank you!";
+
+        Intent intent = new Intent(Intent.ACTION_SENDTO);
+        intent.setData(Uri.parse("mailto:")); // only email apps should handle this
+        intent.putExtra(Intent.EXTRA_SUBJECT, subject);
+        intent.putExtra(Intent.EXTRA_TEXT, priceMessage);
+        if (intent.resolveActivity(getPackageManager()) != null) {
+            startActivity(intent);
+        }
+        else{
+            Log.v("MainActivity", "The intent wasn't sent");
+        }
+
         return priceMessage;
     }
 
@@ -110,15 +127,15 @@ public class MainActivity extends AppCompatActivity {
      * This method displays the given mQuantity value on the screen.
      */
     private void displayQuantity(int number) {
-        TextView quantityTextView = (TextView) findViewById(R.id.quantity_text_view);
-        quantityTextView.setText("" + number);
+        TextView quantityTextView = findViewById(R.id.quantity_text_view);
+        quantityTextView.setText((Integer.toString(number)));
     }
 
     /**
      * This method displays the given text on the screen.
      */
     private void displayMessage(String message) {
-        TextView orderSummaryTextView = (TextView) findViewById(R.id.order_summary_text_view);
+        TextView orderSummaryTextView = findViewById(R.id.order_summary_text_view);
         orderSummaryTextView.setText(message);
     }
 
